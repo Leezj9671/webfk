@@ -1,19 +1,19 @@
-from sylfk import SYLFk
+from sylfk import SYLFk, simple_template
 from sylfk.view import Controller
 from core.base_view import BaseView
 
 class Index(BaseView):
 	def get(self, request):
-		return 'get request HALO'
+		return simple_template("index.html", user="testuser", message="yomantemplate")
 
 class Test(Index):
 	def post(self, request):
-		return 'post requet'
+		return 'post request'
 
 app = SYLFk()
 url_map = [
 	{
-		'url': '/shiyanlou',
+		'url': '/index',
 		'view': Index,
 		'endpoint': 'index'
 	},

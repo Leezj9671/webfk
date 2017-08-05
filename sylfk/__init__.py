@@ -6,6 +6,7 @@ import sylfk.exceptions as exceptions
 from sylfk.wsgi_adapter import wsgi_app
 from sylfk.helper import parse_static_key
 from sylfk.route import Route
+from sylfk.template_engine import replace_template
 
 # 定义常见服务异常的响应体
 ERROR_MAP = {
@@ -32,8 +33,10 @@ class ExecFunc:
 
 class SYLFk:
 
+    template_folder = None
+
     # 实例化方法
-    def __init__(self, static_folder='static'):   
+    def __init__(self, static_folder='static', template_folder='template'):   
         self.host = '127.0.0.1'
         self.port = 8080
         self.url_map = {}
@@ -41,6 +44,8 @@ class SYLFk:
         self.function_map = {}
         self.static_folder = static_folder
         self.route = Route(self)
+        self.template_folder = template_folder
+        SYLFk.template_folder = self.template_folder
 
     # 框架被 WSGI 调用入口的方法
     def __call__(self, environ, start_response):  
@@ -190,4 +195,6 @@ class SYLFk:
         name = controller.__name__()
         for rule in controller.url_map:
             self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
-            
+
+def simple_template(path, **options):
+        return replace_template(SYLFk, path, **options)
