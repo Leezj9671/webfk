@@ -7,6 +7,7 @@ from sylfk.wsgi_adapter import wsgi_app
 from sylfk.helper import parse_static_key
 from sylfk.route import Route
 from sylfk.template_engine import replace_template
+from sylfk.session import create_session_id
 
 # 定义常见服务异常的响应体
 ERROR_MAP = {
@@ -29,7 +30,7 @@ class ExecFunc:
     def __init__(self, func, func_type, **options):
         self.func = func
         self.options = options
-        self.func_type = func_type
+        self.func_type = func_type3。2da3.3.221323213321231
 
 class SYLFk:
 
@@ -54,12 +55,19 @@ class SYLFk:
     # 路由
     def dispatch_request(self, request):
         status = 200  # HTTP状态码定义为 200，表示请求成功
+        cookies = request.cookies
+        # 定义响应报头的 Server 属性
+        
 
-    # 定义响应报头的 Server 属性
-        headers = {
-          'Server': 'Shiyanlou Framework'
-        }
-
+        if 'session_id' not in cookies:
+            headers = {
+            'Set-Cookie': 'session_id=%s' % create_session_id(),
+              'Server': 'A Web Framework'
+            }
+        else:
+            headers = {
+              'Server': 'A Web Framework'
+            }
         # 回传实现 WSGI 规范的响应体给 WSGI 模块
         return Response('<h1>Hello, Framework</h1>', content_type='text/html', headers=headers, status=status)
 
