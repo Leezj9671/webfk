@@ -26,7 +26,7 @@ TYPE_MAP = {
 }
 
 class ExecFunc:
-    
+
     def __init__(self, func, func_type, **options):
         self.func = func
         self.options = options
@@ -50,22 +50,24 @@ class SYLFk:
         SYLFk.template_folder = self.template_folder
 
     # 框架被 WSGI 调用入口的方法
-    def __call__(self, environ, start_response):  
+    def __call__(self, environ, start_response):
         return wsgi_app(self, environ, start_response)
 
-    # 路由
+    # 应用请求处理函数调度入口
     def dispatch_request(self, request):
+
         status = 200  # HTTP状态码定义为 200，表示请求成功
-        cookies = request.cookies
+        cookies = request.cookies # 从请求中取出cookie
+
         # 定义响应报头的 Server 属性
         if 'session_id' not in cookies:
             headers = {
-            'Set-Cookie': 'session_id=%s' % create_session_id(),
-              'Server': 'A Web Framework'
+                'Set-Cookie': 'session_id={}'.format(create_session_id()),
+                'Server': 'A Web Framework'
             }
         else:
             headers = {
-              'Server': 'A Web Framework'
+                'Server': 'A Web Framework'
             }
         # 回传实现 WSGI 规范的响应体给 WSGI 模块
         return Response('<h1>Hello, Framework</h1>', content_type='text/html', headers=headers, status=status)
@@ -79,11 +81,10 @@ class SYLFk:
 
         if host:
             self.host = host
-            
+
         if port:
             self.port = port
 
-        # self.add_static_rule(self.static_folder)
         # static sources
         self.function_map['static'] = ExecFunc(func=self.dispatch_static, func_type='static')
 
