@@ -1,15 +1,34 @@
 from sylfk import SYLFk, simple_template
 from sylfk.view import Controller
-from core.base_view import BaseView
+from sylfk.session import session
+
+from core.base_view import BaseView, SessionView
 
 class Index(BaseView):
 	def get(self, request):
-		return simple_template("index.html", user="testuser", message="yomantemplate")
+		user = session.get(request, 'user')
+		return simple_template("index.html", user=user, message="yomantemplate")
 
 class Test(Index):
 	def post(self, request):
 		return 'post request'
 
+class Login(BaseView):
+	"""docstring for Login"""
+	def get(self, request):
+		return simple_template("login.html")
+
+	def post(self, request):
+		user = request.form['user']
+		session.push(request, 'user', user)
+		return 'Login Success. <a href="/">Back</a>'
+
+class Logout(SessionView):
+
+	def get(self, request):
+		session.pop(request, 'user')
+		return 'Logout Success. <a href="/">Back</a>'
+		
 app = SYLFk()
 url_map = [
 	{
@@ -18,22 +37,18 @@ url_map = [
 		'endpoint': 'index'
 	},
 	{
-		'url': '/test',
-		'view': Test,
+		'url': '/login',
+		'view': Login,
 		'endpoint': 'test'
+	},
+	{
+		'url': '/logout',
+		'view': Logout,
+		'endpoint': 'logout'
 	}
-
 ]
 
 index_controller = Controller('index', url_map)
 app.load_controller(index_controller)
-# @app.route('/index', methods=['GET'])
-# def index():
-#     return '这是一个路由测试页面'
-
-
-# @app.route('/test/js')
-# def test_js():
-#    return '<script src="/static/test.js"></script>'
 
 app.run()

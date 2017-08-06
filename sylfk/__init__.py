@@ -7,7 +7,7 @@ from sylfk.wsgi_adapter import wsgi_app
 from sylfk.helper import parse_static_key
 from sylfk.route import Route
 from sylfk.template_engine import replace_template
-from sylfk.session import create_session_id
+from sylfk.session import create_session_id, session
 
 # 定义常见服务异常的响应体
 ERROR_MAP = {
@@ -30,14 +30,14 @@ class ExecFunc:
     def __init__(self, func, func_type, **options):
         self.func = func
         self.options = options
-        self.func_type = func_type3。2da3.3.221323213321231
+        self.func_type = func_type
 
 class SYLFk:
 
     template_folder = None
 
     # 实例化方法
-    def __init__(self, static_folder='static', template_folder='template'):   
+    def __init__(self, static_folder='static', template_folder='template', session_path=".session"):
         self.host = '127.0.0.1'
         self.port = 8080
         self.url_map = {}
@@ -46,6 +46,7 @@ class SYLFk:
         self.static_folder = static_folder
         self.route = Route(self)
         self.template_folder = template_folder
+        self.session_path = session_path
         SYLFk.template_folder = self.template_folder
 
     # 框架被 WSGI 调用入口的方法
@@ -57,8 +58,6 @@ class SYLFk:
         status = 200  # HTTP状态码定义为 200，表示请求成功
         cookies = request.cookies
         # 定义响应报头的 Server 属性
-        
-
         if 'session_id' not in cookies:
             headers = {
             'Set-Cookie': 'session_id=%s' % create_session_id(),
@@ -77,15 +76,22 @@ class SYLFk:
         for key, value in options.items():
             if value:
                 self.__setattr__(key, value)
-        
+
         if host:
             self.host = host
             
         if port:
             self.port = port
-        
+
+        # self.add_static_rule(self.static_folder)
         # static sources
         self.function_map['static'] = ExecFunc(func=self.dispatch_static, func_type='static')
+
+        if not os.path.exists(self.session_path):
+            os.mkdir(self.session_path)
+
+        session.set_storage_path(self.session_path)
+        session.load_local_session()
 
         run_simple(hostname=self.host, port=self.port, application=self, **options)
         
@@ -98,6 +104,7 @@ class SYLFk:
             raise exceptions.URLExistsError
         
         if endpoint in self.function_map and func_type != 'static':
+            print(endpoint)
             raise exceptions.EndpointExistsError
             
         self.url_map[url] = endpoint
