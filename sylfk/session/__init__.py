@@ -7,9 +7,9 @@ def create_session_id():
 	"""创建Session ID"""
 	return base64.encodebytes(str(time.time()).encode()).decode().replace("=", '')[:-2][::-1]
 
+# 从请求中获取 Session ID
 def get_session_id(request):
-	"""从请求中获取Session ID"""
-	return request.cookies.get('session_id', '')
+    return request.cookies.get('session_id', '')
 
 class Session(object):
 	"""Session会话"""

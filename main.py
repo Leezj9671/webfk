@@ -4,15 +4,10 @@ from sylfk.session import session
 
 from core.base_view import BaseView, SessionView
 
-class Index(BaseView):
+class Index(SessionView):
 	def get(self, request):
 		user = session.get(request, 'user')
-		print(user)
 		return simple_template("index.html", user=user, message="yomantemplate")
-
-class Test(Index):
-	def post(self, request):
-		return 'post request'
 
 class Login(BaseView):
 	"""docstring for Login"""
@@ -40,7 +35,7 @@ url_map = [
 	{
 		'url': '/login',
 		'view': Login,
-		'endpoint': 'test'
+		'endpoint': 'login'
 	},
 	{
 		'url': '/logout',

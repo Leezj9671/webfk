@@ -29,16 +29,16 @@ class AuthLogin(AuthSession):
 		return '<a href="/login">LOGIN</a>'
 
 	@staticmethod
-	def auth_login(request, *args, **options):
-		print(session.map(request))
+	def auth_logic(request, *args, **options):
 		if 'user' in session.map(request):
 			return True
 		return False
+
 
 class SessionView(BaseView):
 	"""会话视图基类"""
 
 	#验证类装饰器
-	@AuthLogin.auth_login
+	@AuthLogin.auth_session
 	def dispatch_request(self, request, *args, **options):
 		return super(SessionView, self).dispatch_request(request, *args, **options)
