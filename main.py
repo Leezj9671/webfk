@@ -7,6 +7,7 @@ from core.base_view import BaseView, SessionView
 class Index(BaseView):
 	def get(self, request):
 		user = session.get(request, 'user')
+		print(user)
 		return simple_template("index.html", user=user, message="yomantemplate")
 
 class Test(Index):
@@ -32,7 +33,7 @@ class Logout(SessionView):
 app = SYLFk()
 url_map = [
 	{
-		'url': '/index',
+		'url': '/',
 		'view': Index,
 		'endpoint': 'index'
 	},

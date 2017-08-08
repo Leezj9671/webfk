@@ -85,7 +85,7 @@ class Session(object):
 			return self.__session_map__.get(get_session_id(request), {}).get(item, None)
 
 class AuthSession:
-
+    
     @classmethod
     def auth_session(cls, f, *args, **options):
 

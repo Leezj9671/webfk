@@ -2,8 +2,9 @@ from sylfk.view import View
 from sylfk.session import AuthSession, session
 
 class BaseView(View):
+    	
 	methods = ['GET', 'POST']
-	def post(self, request, *args, **options):
+	def get(self, request, *args, **options):
 		pass
 
 	def post(self, request, *args, **options):
@@ -21,7 +22,7 @@ class BaseView(View):
 			return '<h1>Unkown or unsupported require method</h1>'
 
 class AuthLogin(AuthSession):
-	"""docstring for AuthLogin"""
+	"""登陆验证类，基类为AuthSession"""
 
 	@staticmethod
 	def auth_fail_callback(request, *args, **options):
@@ -29,14 +30,15 @@ class AuthLogin(AuthSession):
 
 	@staticmethod
 	def auth_login(request, *args, **options):
+		print(session.map(request))
 		if 'user' in session.map(request):
 			return True
 		return False
 
 class SessionView(BaseView):
-	"""session view"""
+	"""会话视图基类"""
 
-	@AuthLogin.auth_session
+	#验证类装饰器
+	@AuthLogin.auth_login
 	def dispatch_request(self, request, *args, **options):
-		return super(SessionView, self).dispatch_request(request,*args, **options)
-		
+		return super(SessionView, self).dispatch_request(request, *args, **options)

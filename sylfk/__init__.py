@@ -85,6 +85,7 @@ class SYLFk:
         if port:
             self.port = port
 
+        # !!!self.add_static_rule(self.static_folder)
         # static sources
         self.function_map['static'] = ExecFunc(func=self.dispatch_static, func_type='static')
 
@@ -97,21 +98,20 @@ class SYLFk:
         run_simple(hostname=self.host, port=self.port, application=self, **options)
         
     def add_url_rule(self, url, func, func_type, endpoint=None, **options):
-        
+
         if endpoint is None:
             endpoint = func.__name__
-            
+
         if url in self.url_map:
             raise exceptions.URLExistsError
-        
+
         if endpoint in self.function_map and func_type != 'static':
-            print(endpoint)
             raise exceptions.EndpointExistsError
-            
+
         self.url_map[url] = endpoint
-        
+
         self.function_map[endpoint] = ExecFunc(func, func_type, **options)
-    
+
     def dispatch_static(self, static_path):
         # 判断资源文件是否在静态资源规则中，如果不存在，返回 404 状态页
         if os.path.exists(static_path):
@@ -130,12 +130,10 @@ class SYLFk:
         else:
             # 返回 404 页面为找到对应的响应体
             return ERROR_MAP['404']
-        
+
     def dispatch_request(self, request):
         # 去掉 URL 中 域名部分，也就从 http://xxx.com/path/file?xx=xx 中提取 path/file 这部分
         url = "/" + "/".join(request.url.split("/")[3:]).split("?")[0]
-        print(url)
-        print(self.static_folder)
         # 通过 URL 寻找节点名
         if url.find(self.static_folder) == 1 and url.index(self.static_folder) == 1:
             # 如果 URL 以静态资源文件夹名首目录，则资源为静态资源，节点定义为 static
@@ -151,23 +149,21 @@ class SYLFk:
         # 如果节点为空 返回 404
         if endpoint is None:
             return ERROR_MAP['404']
-    
+
         # 获取节点对应的执行函数
-        print(endpoint)
-        print(self.function_map)
         exec_function = self.function_map[endpoint]
-    
+
         # 判断执行函数类型
         if exec_function.func_type == 'route':
-            """ 路由处理 """  
-    
+            """ 路由处理 """
+
             # 判断请求方法是否支持
             if request.method in exec_function.options.get('methods'):
                 """ 路由处理结果 """
-    
+
                 # 判断路由的执行函数是否需要请求体进行内部处理
                 argcount = exec_function.func.__code__.co_argcount
-    
+
                 if argcount > 0:
                     # 需要附带请求体进行结果处理
                     rep = exec_function.func(request)
@@ -176,18 +172,18 @@ class SYLFk:
                     rep = exec_function.func()
             else:
                 """ 未知请求方法 """
-    
+
                 # 返回 401 错误响应体
                 return ERROR_MAP['401']
     
         elif exec_function.func_type == 'view':
             """ 视图处理结果 """
-    
+
             # 所有视图处理函数都需要附带请求体来获取处理结果
             rep = exec_function.func(request)
         elif exec_function.func_type == 'static':
             """ 静态逻辑处理 """
-    
+
             # 静态资源返回的是一个预先封装好的响应体，所以直接返回
             return exec_function.func(url)
         else:
@@ -195,12 +191,12 @@ class SYLFk:
     
             # 返回 503 错误响应体
             return ERROR_MAP['503']
-    
+
         # 定义 200 状态码表示成功
         status = 200
         # 定义响应体类型
         content_type = 'text/html'
-    
+
         # 返回响应体
         return Response(rep, content_type='%s; charset=UTF-8' % content_type, headers=headers, status=status)
 
@@ -213,4 +209,4 @@ class SYLFk:
             self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
 
 def simple_template(path, **options):
-        return replace_template(SYLFk, path, **options)
+    return replace_template(SYLFk, path, **options)
