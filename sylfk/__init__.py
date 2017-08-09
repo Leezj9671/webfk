@@ -125,8 +125,19 @@ class SYLFk:
             endpoint = self.url_map.get(url, None)
 
         # 定义响应报头，Server 参数的值表示运行的服务名，通常有 IIS， Apache，Tomcat，Nginx等，这里自定义为 SYL Web 0.1
-        headers = {'Server': 'SYL Web 0.1'}
-    
+        cookies = request.cookies
+
+        if 'session_id' not in cookies:
+            headers = {
+                'Set-Cookie': 'session_id=%s' % create_session_id(),
+                'Server': 'AWEB Framework'
+            }
+
+        else:
+            headers = {
+                'Server': 'AWEB Framework'
+            }
+
         # 如果节点为空 返回 404
         if endpoint is None:
             return ERROR_MAP['404']
@@ -180,6 +191,9 @@ class SYLFk:
         # 定义响应体类型
         content_type = 'text/html'
 
+        if isinstance(rep, Response):
+            return rep
+
         # 返回响应体
         return Response(rep, content_type='%s; charset=UTF-8' % content_type, headers=headers, status=status)
 
@@ -195,3 +209,8 @@ class SYLFk:
 
 def simple_template(path, **options):
     return replace_template(SYLFk, path, **options)
+
+def redirect(url, status_code=302):
+    response = Response('', status=status_code)
+    response.headers['Location'] = url
+    return response
