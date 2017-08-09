@@ -1,5 +1,6 @@
 from sylfk.view import View
 from sylfk.session import AuthSession, session
+from sylfk import redirect
 
 class BaseView(View):
     	
@@ -26,7 +27,7 @@ class AuthLogin(AuthSession):
 
 	@staticmethod
 	def auth_fail_callback(request, *args, **options):
-		return '<a href="/login">LOGIN</a>'
+		return redirect('/login')
 
 	@staticmethod
 	def auth_logic(request, *args, **options):

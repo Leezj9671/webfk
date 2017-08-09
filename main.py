@@ -17,13 +17,13 @@ class Login(BaseView):
 	def post(self, request):
 		user = request.form['user']
 		session.push(request, 'user', user)
-		return 'Login Success. <a href="/">Back</a>'
+		return redirect('/')
 
 class Logout(SessionView):
 
 	def get(self, request):
 		session.pop(request, 'user')
-		return 'Logout Success. <a href="/">Back</a>'
+		return redirect('/')
 		
 app = SYLFk()
 url_map = [
