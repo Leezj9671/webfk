@@ -29,4 +29,4 @@ class Controller(object):
 		self.name = name
 
 	def __name__(self):
-		return self.name		
+		return self.name

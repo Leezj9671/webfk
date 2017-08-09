@@ -53,25 +53,6 @@ class SYLFk:
     def __call__(self, environ, start_response):
         return wsgi_app(self, environ, start_response)
 
-    # 应用请求处理函数调度入口
-    def dispatch_request(self, request):
-
-        status = 200  # HTTP状态码定义为 200，表示请求成功
-        cookies = request.cookies # 从请求中取出cookie
-
-        # 定义响应报头的 Server 属性
-        if 'session_id' not in cookies:
-            headers = {
-                'Set-Cookie': 'session_id={}'.format(create_session_id()),
-                'Server': 'A Web Framework'
-            }
-        else:
-            headers = {
-                'Server': 'A Web Framework'
-            }
-        # 回传实现 WSGI 规范的响应体给 WSGI 模块
-        return Response('<h1>Hello, Framework</h1>', content_type='text/html', headers=headers, status=status)
-
   # 启动入口
     def run(self, host=None, port=None, **options):
 
@@ -181,11 +162,13 @@ class SYLFk:
 
             # 所有视图处理函数都需要附带请求体来获取处理结果
             rep = exec_function.func(request)
+
         elif exec_function.func_type == 'static':
             """ 静态逻辑处理 """
 
             # 静态资源返回的是一个预先封装好的响应体，所以直接返回
             return exec_function.func(url)
+
         else:
             """ 未知类型处理 """
     
@@ -203,9 +186,11 @@ class SYLFk:
     def bind_view(self, url, view_class, endpoint):
         self.add_url_rule(url, func=view_class.get_func(endpoint), func_type='view')
 
+    # 控制器加载
     def load_controller(self, controller):
         name = controller.__name__()
         for rule in controller.url_map:
+            # 绑定 URL 与 视图对象，最后的节点名格式为 `控制器名` + "." + 定义的节点名
             self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
 
 def simple_template(path, **options):

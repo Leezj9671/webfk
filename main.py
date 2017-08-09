@@ -35,7 +35,7 @@ url_map = [
 	{
 		'url': '/login',
 		'view': Login,
-		'endpoint': 'login'
+		'endpoint': 'test'
 	},
 	{
 		'url': '/logout',
