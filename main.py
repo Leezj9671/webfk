@@ -1,4 +1,4 @@
-from sylfk import SYLFk, simple_template
+from sylfk import SYLFk, simple_template, redirect
 from sylfk.view import Controller
 from sylfk.session import session
 
