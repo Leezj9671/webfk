@@ -1,8 +1,19 @@
-from sylfk import SYLFk, simple_template, redirect
+from sylfk import SYLFk, simple_template, redirect, render_json
 from sylfk.view import Controller
 from sylfk.session import session
 
 from core.base_view import BaseView, SessionView
+from core.database import dbconn
+
+class API(BaseView):
+	def get(self, request):
+		data = {
+			'name': 'testname',
+			'company': 'testcompany',
+			'department': 'testdepartment'
+		}
+
+		return render_json(data)
 
 class Index(SessionView):
 	def get(self, request):
@@ -12,19 +23,39 @@ class Index(SessionView):
 class Login(BaseView):
 	"""docstring for Login"""
 	def get(self, request):
-		return simple_template("login.html")
+		state = request.args.get('state', "1")
+
+		return simple_template("layout.html", title='Login', message="Input your username")
 
 	def post(self, request):
-		user = request.form['user']
-		session.push(request, 'user', user)
-		return redirect('/')
+		ret = dbconn.execute('''SELECT * FROM user WHERE f_name=%(user)s''', request.form)
+
+		if ret.rows == 1:
+			user = request.form['f_name']
+			session.push(request, 'user', user)
+			return redirect('/')
+
+		return redirect("/login?state=0")
 
 class Logout(SessionView):
 
 	def get(self, request):
 		session.pop(request, 'user')
 		return redirect('/')
-		
+
+class Register(BaseView):
+	"""docstring for Register"""
+	def get(self, request):
+		return simple_template("layout.html", title="Register", message="Input your username")
+
+	def post(self, request):
+		ret = dbconn.insert('INSERT INTO user(f_name) VALUES(%(user)s)', request.form)
+
+		if ret.suc:
+			return redirect("/login")
+		else:
+			return render_json(ret.to_dict())
+
 app = SYLFk()
 url_map = [
 	{
@@ -41,7 +72,18 @@ url_map = [
 		'url': '/logout',
 		'view': Logout,
 		'endpoint': 'logout'
-	}
+	},
+	{
+		'url': '/api',
+		'view': API,
+		'endpoint': 'api'
+	},
+	{
+		'url': '/register',
+		'view': Register,
+		'endpoint': 'register'
+	},
+
 ]
 
 index_controller = Controller('index', url_map)

@@ -1,6 +1,7 @@
 import os
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Response
+import json
 
 import sylfk.exceptions as exceptions
 from sylfk.wsgi_adapter import wsgi_app
@@ -214,3 +215,12 @@ def redirect(url, status_code=302):
     response = Response('', status=status_code)
     response.headers['Location'] = url
     return response
+
+def render_json(data):
+    content_type = "text/plain"
+
+    if isinstance(data, dict) or isinstance(data, list):
+        data = json.dumps(data)
+        content_type = "application/json"
+
+    return Response(data, content_type="%s; charset=UTF-8" % content_type, status=200)
