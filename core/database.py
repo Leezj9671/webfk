@@ -6,6 +6,7 @@ db_database = "shiyanlou"
 
 try:
 	dbconn = BaseDB(db_user, db_password, db_database)
+
 except Exception as e:
 	code, _ = e.args
 	print('code %s' % code)
@@ -22,12 +23,15 @@ except Exception as e:
 
 		if ret.suc:
 			ret = dbconn.choose_db(db_database)
+			if ret.suc:
+				# 创建数据表
+				ret = dbconn.execute(create_table)
 
-	if ret.suc is False:
-		dbconn.drop_db(db_database)
-		# LOG
-		print(ret.error.args)
-		exit()
+		else:
+			dbconn.drop_db(db_database)
+			# LOG
+			print(ret.error.args)
+			exit()
 	else:
 		# LOG
 		print(e)
