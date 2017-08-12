@@ -62,6 +62,7 @@ class BaseDB():
 	def close(self):
 		self.conn.close()
 
+	@DBResult.handler
 	def execute(self, sql, params=None):
 		with self.conn as cursor:
 			rows = cursor.execute(sql, params) if params and isinstance(params, dict) else cursor.execute(sql)
