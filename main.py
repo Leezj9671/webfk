@@ -1,4 +1,4 @@
-from sylfk import SYLFk, simple_template, redirect, render_json
+from sylfk import SYLFk, simple_template, redirect, render_json, render_file, exceptions
 from sylfk.view import Controller
 from sylfk.session import session
 
@@ -59,7 +59,7 @@ class Register(BaseView):
 
 class Download(BaseView):
 	def get(self, request):
-		return render_file("main.py")
+		return render_file("/etc/")
 
 app = SYLFk()
 url_map = [
@@ -94,6 +94,10 @@ url_map = [
 		'endpoint': 'download'
 	},
 ]
+
+@exceptions.reload(404)
+def test_reload():
+	return '404 error'
 
 index_controller = Controller('index', url_map)
 app.load_controller(index_controller)
