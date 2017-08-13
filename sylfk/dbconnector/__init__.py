@@ -42,8 +42,7 @@ class DBResult:
 
 class BaseDB():
 	"""Database"""
-	def __init__(self, user, password, database='', host='127.0.0.1', port=3306, \
-		charset='utf8', cursor_class=pymysql.cursors.DictCursor):
+	def __init__(self, user, password, database='', host='127.0.0.1', port=3306, charset='utf8', cursor_class=pymysql.cursors.DictCursor):
 		
 		self.user = user
 		self.password = password
@@ -55,9 +54,7 @@ class BaseDB():
 		self.conn = self.connect()
 
 	def connect(self):
-		return pymysql.connect(host=self.host, user=self.user, port=self.port,
-			passwd=self.password, db=self.database, charset=self.charset,
-			cursorclass=self.cursor_class)
+		return pymysql.connect(host=self.host, user=self.user, port=self.port, passwd=self.password, db=self.database, charset=self.charset, cursorclass=self.cursor_class)
 
 	def close(self):
 		self.conn.close()

@@ -25,13 +25,13 @@ class Login(BaseView):
 	def get(self, request):
 		state = request.args.get('state', "1")
 
-		return simple_template("layout.html", title='Login', message="Input your username")
+		return simple_template("layout.html", title='Login', message="Input your username" if state=="1" else "Error Username")
 
 	def post(self, request):
 		ret = dbconn.execute('''SELECT * FROM user WHERE f_name=%(user)s''', request.form)
 
 		if ret.rows == 1:
-			user = request.form['f_name']
+			user = request.form['user']
 			session.push(request, 'user', user)
 			return redirect('/')
 

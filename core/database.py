@@ -1,16 +1,16 @@
 from sylfk.dbconnector import BaseDB
 
 db_user = 'root'
-db_password = ''
+db_password = 'toor'
 db_database = "shiyanlou"
+db_add = '192.168.64.130'
 
 try:
-	dbconn = BaseDB(db_user, db_password, db_database)
+	dbconn = BaseDB(db_user, db_password, db_database, db_add)
 
 except Exception as e:
 	code, _ = e.args
-	print('code %s' % code)
-	if code == 1049 or code == 1146:
+	if code == 1049:
 		create_table = '''
 				CREATE TABLE user (
 				id INT PRIMARY KEY AUTO_INCREMENT,
@@ -18,13 +18,16 @@ except Exception as e:
 				) CHARSET=utf8
 				'''
 
-		dbconn = BaseDB(db_user, db_password)
+		dbconn = BaseDB(db_user, db_password, '', db_add)
+		print('creating database..')
 		ret = dbconn.create_db(db_database)
-
+		print(ret.suc)
 		if ret.suc:
+			print('choose db')
 			ret = dbconn.choose_db(db_database)
 			if ret.suc:
 				# 创建数据表
+				print('create table')
 				ret = dbconn.execute(create_table)
 
 		else:
