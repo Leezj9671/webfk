@@ -56,6 +56,11 @@ class Register(BaseView):
 		else:
 			return render_json(ret.to_dict())
 
+
+class Download(BaseView):
+	def get(self, request):
+		return render_file("main.py")
+
 app = SYLFk()
 url_map = [
 	{
@@ -83,7 +88,11 @@ url_map = [
 		'view': Register,
 		'endpoint': 'register'
 	},
-
+	{
+		'url': '/download',
+		'view': Download,
+		'endpoint': 'download'
+	},
 ]
 
 index_controller = Controller('index', url_map)

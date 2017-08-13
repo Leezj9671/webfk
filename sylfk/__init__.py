@@ -224,3 +224,29 @@ def render_json(data):
         content_type = "application/json"
 
     return Response(data, content_type="%s; charset=UTF-8" % content_type, status=200)
+
+
+# 返回让客户端保存文件到本地的响应体
+def render_file(file_path, file_name=None):
+
+    # 判断服务器是否有该文件，没有则返回 404 错误
+    if os.path.exists(file_path):
+
+        # 读取文件内容
+        with open(file_path, "rb") as f:
+            content = f.read()
+
+        # 如果没有设置文件名，则以 “/” 分割路径取最后一项最为文件名
+        if file_name is None:
+            file_name = file_path.split("/")[-1]
+
+        # 封装响应报头，指定为附件类型，并定义下载的文件名
+        headers = {
+            'Content-Disposition': 'attachment; filename="%s"' % file_name
+        }
+
+        # 返回响应体
+        return Response(content, headers=headers, status=200)
+
+    # 如果不存在该文件，返回 404 错误
+    return ERROR_MAP['404']
