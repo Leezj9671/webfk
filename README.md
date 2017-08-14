@@ -16,4 +16,4 @@ A simple web framework
 ## Usage
 See main.py.
 ## Attentions
-- service mssql must start
+- service mysql must start
